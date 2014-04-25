@@ -1,4 +1,5 @@
-ah-onboard-modules
+ah-onboard
 =======================
 
-Bash script to automate adding acquia_connector, fast_404, and memcache to Drupal repos.
+Bash scripts to automate onboarding tasks.
+
