@@ -21,3 +21,9 @@ __Note:__ Checks for the presence of each module before making any changes. Opti
 ```
 ./ah-onboard/modules.sh /path/to/docroot-dir 6|7 [subdir]
 ```
+
+#### Adding Support for a New Module Subdir
+
+```
+./ah-onboard/add-subdir.sh subdir
+```
