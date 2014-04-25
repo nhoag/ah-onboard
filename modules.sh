@@ -78,5 +78,5 @@ GIT=`which git`
 
 for i in "${DIFF[@]}"; do
   find . -type d -name $i \
-    | xargs -I {} sh -c 'git add {} ; git commit -m "Adds {}"'
+    | xargs -I {} sh -c "git add {} ; git commit -m \"Adds $i\""
 done
