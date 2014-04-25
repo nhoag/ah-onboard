@@ -6,7 +6,7 @@ set -o errexit
 function usage() {
     cat <<EOF
 
-    Usage: ${0} path-to-codebase [6|7]
+    Usage: ${0} path-to-codebase [6|7] [subdir]
 
     OPTIONS:
       -h        Show usage
