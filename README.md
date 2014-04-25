@@ -24,6 +24,7 @@ __Note:__ Checks for the presence of each module before making any changes. Opti
 
 #### Add support for a new subdir
 
+For those times when contrib modules are located someplace other than 'sites/all/modules' or 'sites/all/modules/contrib':
 ```
 ./ah-onboard/add-subdir.sh subdir
 ```
