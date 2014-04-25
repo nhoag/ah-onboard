@@ -42,3 +42,5 @@ for i in "${VERSIONS[@]}"; do
       -exec $SED -i "s/contrib/${SUBDIR}/g" {} \;
   fi
 done
+
+echo "Support added for subdir: sites/all/modules/$SUBDIR"
