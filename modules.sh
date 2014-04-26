@@ -6,20 +6,24 @@ set -o errexit
 function usage() {
     cat <<EOF
 
-    Usage: ${0} path-to-codebase [6|7] [subdir]
+    Usage: ${0} [-y] docroot-path 6|7 [subdir]
 
     OPTIONS:
       -h        Show usage
+      -y        Assume 'yes' for prompts
 
 EOF
 exit
 }
 
-while getopts "h" OPTION; do
+while getopts "hy" OPTION; do
   case $OPTION in
-    h) usage ;;
+    h) usage          ;;
+    y) YES=1          ;;
   esac
 done
+
+shift $((OPTIND - 1))
 
 if [ $# -eq 0 ]; then
   usage
@@ -30,6 +34,7 @@ CODEBASE=$1
 VERSION=$2
 DRUSH=`which drush`
 CONTRIB=${3:-'modules'}
+CONFIRM=${YES:-0}
 
 function diff() {
   awk 'BEGIN{RS=ORS=" "}
@@ -46,21 +51,11 @@ PRESENT=(
 )
 
 if [[ ${#PRESENT[@]} -eq 0 ]]; then
-  echo "Projects not found. Proceeding..."
   DIFF=("${MODULES[@]}")
 else
   printf "%s\n" "${PRESENT[@]}" \
     | xargs -I {} echo "{} already in codebase."
   DIFF=($(diff MODULES[@] PRESENT[@]))
-fi
-
-CONTRIB_CHECK=$(find $CODEBASE/"sites"/"all" -type d -name $CONTRIB)
-
-if [[ -z "$CONTRIB_CHECK" ]]; then
-  echo "Error: $CONTRIB dir not found."
-  exit
-else
-  CONTRIB_DIR=$( basename "${CONTRIB_CHECK}" )
 fi
 
 function makefile() {
@@ -84,9 +79,25 @@ EOF
 }
 
 if [[ ${#DIFF[@]} -eq 0 ]]; then
-  echo "All modules are present in the codebase. Exiting script..."
+  echo -e "All modules already present in the codebase."
   exit
 else
+  if [[ $CONTRIB == 'modules' ]]; then
+    CONTRIB_PATH="sites/all/modules"
+  else
+    CONTRIB_PATH="sites/all/modules/$CONTRIB"
+  fi
+  if [[ $CONFIRM != 1 ]]; then
+    while [[ true ]]; do
+      read -p "Modules will be added at $CONTRIB_PATH. Proceed? [y/n]:" answer
+      case $answer in
+        [yY]* ) break ;;
+        [nN]* ) echo -e "\n  Script aborted.\n"
+                exit ;;
+        * ) echo -e "\n  Answer must be either y/n.\n" ;;
+      esac
+    done
+  fi
   cd $CODEBASE
   for i in "${DIFF[@]}"; do
     makefile $VERSION $i $CONTRIB \
@@ -95,8 +106,12 @@ else
 fi
 
 GIT=`which git`
+echo ""
 
 for i in "${DIFF[@]}"; do
   find . -type d -name $i \
-    | xargs -I {} sh -c "git add {} ; git commit -m \"Adds $i\""
+    | xargs -I {} sh -c "$GIT add {} ; $GIT commit -q -m \"Adds $i\""
+  echo -e "  Added and committed $i"
 done
+
+echo -e "\nScript completed successfully.\n"

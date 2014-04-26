@@ -8,7 +8,7 @@ Bash scripts to automate onboarding tasks.
 git clone git@github.com:nhoag/ah-onboard.git
 ```
 
-#### Run
+### Add modules
 
 Download, add, and commit the following contrib modules:
 
@@ -16,8 +16,14 @@ Download, add, and commit the following contrib modules:
 - [fast_404](https://drupal.org/project/fast_404)
 - [memcache](https://drupal.org/project/memcache)
 
-__Note:__ Checks for the presence of each module before making any changes. Optionally locate modules in 'sites/all/modules' subdirectory.
+#### Features
+
+- Checks for the presence of each module before making any changes.
+- Optionally locate modules in subdirectory of 'sites/all/modules'.
+- Assumes Git.
+
+#### Command
 
 ```
-./ah-onboard/modules.sh /path/to/docroot-dir 6|7 [subdir]
+./ah-onboard/modules.sh [-y] docroot-path 6|7 [subdir]
 ```
