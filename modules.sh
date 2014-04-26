@@ -63,15 +63,35 @@ else
   CONTRIB_DIR=$( basename "${CONTRIB_CHECK}" )
 fi
 
+function makefile() {
+  if [[ $3 == 'modules' ]]; then
+    cat <<EOF
+core = $1.x
+api = 2
+
+; Modules
+projects[] = $2
+EOF
+  else
+    cat <<EOF
+core = $1.x
+api = 2
+
+; Modules
+projects[$2][subdir] = $3
+EOF
+  fi
+}
+
 if [[ ${#DIFF[@]} -eq 0 ]]; then
   echo "All modules are present in the codebase. Exiting script..."
   exit
 else
   cd $CODEBASE
-  printf "%s\n" "${DIFF[@]}" \
-    | xargs -I {} $DRUSH make \
-      --no-core -y \
-      $DIR/$VERSION/$CONTRIB_DIR/{}.make
+  for i in "${DIFF[@]}"; do
+    makefile $VERSION $i $CONTRIB \
+      | $DRUSH make --no-core -y php://stdin
+  done
 fi
 
 GIT=`which git`
